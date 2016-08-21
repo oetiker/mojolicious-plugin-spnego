@@ -10,13 +10,12 @@ my $SERVER = $ENV{AD_SERVER} // die "AD_SERVER env variable not set";
 
 app->secrets(['My secret passphrase here']);
 
-plugin 'SPNEGO';
+plugin 'SPNEGO', ad_server => $SERVER;
 
 get '/' => sub {
     my $c = shift;
     if (not $c->session('user')){
-        $c->ntlm_auth({
-            ad_server => $SERVER,
+        $c->ntlm_auth(
             auth_success_callback => sub {
                 my $c = shift;
                 my $user = shift;
@@ -27,7 +26,7 @@ get '/' => sub {
                 $c->session('groups',[ sort keys %$groups]);
                 return 1;
             }
-        }) or return;
+        ) or return;
     }
 } => 'index';
 

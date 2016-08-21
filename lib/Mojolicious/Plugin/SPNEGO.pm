@@ -9,10 +9,11 @@ my %cCache;
 sub register {
     my $self = shift;
     my $app = shift;
-    my $cfg = shift || {};
+    my $plugin_cfg = ref $_[0] ? $_[0] : { @_ };
     $app->helper(
         ntlm_auth => sub {
             my $c = shift;
+            my $cfg = { %$plugin_cfg, ref $_[0] ? %$_[0] :  @_ };
             my $cId = $c->tx->connection;
             my $cCache = $cCache{$cId} //= { status => 'init' };
             return if $cCache->{status} eq 'authenticated';
@@ -20,7 +21,7 @@ sub register {
             my $authorization = $c->req->headers->header('Authorization') // '';
             my ($AuthBase64) = ($authorization =~ /^NTLM\s(.+)$/);
             for ($AuthBase64 and $cCache->{status} =~ /^expect(Type\d)/){
-                my $ldap = $cCache->{ldapObj} //= Net::LDAP::SPNEGO->new($cg->{ad_server},debug=>$cfg->{ldap_debug});
+                my $ldap = $cCache->{ldapObj} //= Net::LDAP::SPNEGO->new($cfg->{ad_server},debug=>$cfg->{ldap_debug});
                 /^Type1/ && do {
                     my $mesg = $ldap->bind_type1($AuthBase64);
                     if ($mesg->{ntlm_type2_base64}){
@@ -67,13 +68,12 @@ use Mojolicious::Lite;
 
  app->secrets(['My secret passphrase here']);
 
- plugin 'SPNEGO';
+ plugin 'SPNEGO', ad_server => $SERVER;
 
  get '/' => sub {
     my $c = shift;
     if (not $c->session('user')){
         $c->ntlm_auth({
-            ad_server => $SERVER,
             auth_success_callback => sub {
                 my $c = shift;
                 my $user = shift;
@@ -114,6 +114,10 @@ use Mojolicious::Lite;
 The Mojolicious::Plugin::SPNEGO lets you provide NTLM SSO by using an
 active directory server as authentication provider. The plugin uses
 the L<Net::LDAP::SPNEGO> module.
+
+On loading the plugin default values for the helpers can be configures:
+
+ plugin 'SPNEGO', ad_server => $SERVER;
 
 The plugin provides the following helpers:
 
