@@ -1,0 +1,9 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+eg/demo.pl
+lib/Mojolicious/Plugin/SPNEGO.pm
+t/01basic.t
