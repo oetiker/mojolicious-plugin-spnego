@@ -71,11 +71,11 @@ The plugin provides the following helper method:
 
 ## $c->ntlm\_auth({ad\_server => $AD\_SERVER\[, auth\_success\_cb=> $cb \])
 
-The _ntlm\_auth_ method runs an NTLM authentication dialog with the browser
+The `ntlm_auth` method runs an NTLM authentication dialog with the browser
 by forwarding the tokens coming from the browser to the AD server specified
-in the _ad\_server_ argument.
+in the `ad_server` argument.
 
-If a _auth\_success\_cb_ is specified it will be executed once the ntlm dialog
+If a `auth_success_cb` is specified it will be executed once the ntlm dialog
 has completed successfully. Depending on the return value of the
 callback the entire process will be considered successfull or not.
 

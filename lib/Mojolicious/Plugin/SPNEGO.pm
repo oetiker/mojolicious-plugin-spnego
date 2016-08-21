@@ -127,11 +127,11 @@ The plugin provides the following helper method:
 
 =head2 $c->ntlm_auth({ad_server => $AD_SERVER[, auth_success_cb=> $cb ])
 
-The I<ntlm_auth> method runs an NTLM authentication dialog with the browser
+The C<ntlm_auth> method runs an NTLM authentication dialog with the browser
 by forwarding the tokens coming from the browser to the AD server specified
-in the I<ad_server> argument.
+in the C<ad_server> argument.
 
-If a I<auth_success_cb> is specified it will be executed once the ntlm dialog
+If a C<auth_success_cb> is specified it will be executed once the ntlm dialog
 has completed successfully. Depending on the return value of the
 callback the entire process will be considered successfull or not.
 
