@@ -125,7 +125,7 @@ or
 
 The plugin provides the following helper method:
 
-=head2 $c->ntlm_auth({ad_server => $AD_SERVER[, auth_success_cb=> $cb ])
+=head2 $c->ntlm_auth(ad_server => $AD_SERVER, auth_success_cb => $cb)
 
 The C<ntlm_auth> method runs an NTLM authentication dialog with the browser
 by forwarding the tokens coming from the browser to the AD server specified
