@@ -62,7 +62,7 @@ __END__
 
 =head1 Mojolicious::Plugin::SPNEGO
 
-use Mojolicious::Lite;
+ use Mojolicious::Lite;
 
  my $SERVER = $ENV{AD_SERVER} // die "AD_SERVER env variable not set";
 
