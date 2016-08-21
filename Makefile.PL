@@ -8,7 +8,7 @@ use Data::Dumper;
 use lib "$FindBin::RealBin/3rd/lib/perl5";
 
 WriteMakefile(
-  NAME         => 'Net::LDAP::SPNEGO',
+  NAME         => 'Mojolicious::Plugin::SPNEGO',
   VERSION_FROM => 'lib/Mojolicious/Plugin/SPNEGO.pm',
   ABSTRACT     => 'Provide NTLM authentication by forwarding requests to an upstram AD server',
   AUTHOR       => 'Tobias Oetiker <tobi@oetiker.ch>',
