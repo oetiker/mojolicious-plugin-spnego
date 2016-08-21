@@ -2,7 +2,7 @@ package Mojolicious::Plugin::SPNEGO;
 use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 
-our $VERSION = '0.2.0';
+our $VERSION = '0.2.1';
 
 my %cCache;
 
@@ -142,9 +142,28 @@ Note that windows will only do automatic NTLM SSO with hosts in the local zone
 so you may have to add your webserver to this group of machines in the
 Internet Settings dialog.
 
+=head1 EXAMPLE
+
+The included example script F<eg/demo.pl> shows how to use the plugin
+to implement NTLM authentication for a L<Mojolicious::Lite> web application.
+
+Use the following steps to run the demo:
+
+ $ perl Makefile.PL
+ $ make 3rd
+ $ env AD_SERVER=ad-server.example.com ./eg/demo.pl deamon
+
+Now connect with your webbrowser to the webserver runing on port 3000. If you
+login from a Windows host and the url you are connecting resides in the local
+zone, you will see (or rather not see) seemless authentication taking place.
+Finally a webpage will be displayed showing a list of groups you are a member of.
+
+The demo script stores your authentication in a cookie in your brower, so once
+you are authenticated, you will have to restart the browser or remove the cookie
+to force another authentication.
 =head1 COPYRIGHT
 
-Copyright OETIKER+PARTNER AG 2016
+Copyright OETIKER+PARTNER AG 2016. All rights reserved.
 
 =head1 LICENSE
 
@@ -155,4 +174,6 @@ it under the same terms as Perl itself.
 
 S<Tobias Oetiker, E<lt>tobi@oetiker.chE<gt>>
 
-=cut
+=head1 HISTORY
+
+ 2016-08-21 to 0.1.0 initial version
