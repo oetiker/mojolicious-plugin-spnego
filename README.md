@@ -107,7 +107,8 @@ Finally a webpage will be displayed showing a list of groups you are a member of
 The demo script stores your authentication in a cookie in your brower, so once
 you are authenticated, you will have to restart the browser or remove the cookie
 to force another authentication.
-&#x3d;head1 COPYRIGHT
+
+# COPYRIGHT
 
 Copyright OETIKER+PARTNER AG 2016. All rights reserved.
 

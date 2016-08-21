@@ -2,7 +2,7 @@ package Mojolicious::Plugin::SPNEGO;
 use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 
-our $VERSION = '0.2.1';
+our $VERSION = '0.2.2';
 
 my %cCache;
 
@@ -161,6 +161,7 @@ Finally a webpage will be displayed showing a list of groups you are a member of
 The demo script stores your authentication in a cookie in your brower, so once
 you are authenticated, you will have to restart the browser or remove the cookie
 to force another authentication.
+
 =head1 COPYRIGHT
 
 Copyright OETIKER+PARTNER AG 2016. All rights reserved.
