@@ -1,8 +1,8 @@
 # Mojolicious::Plugin::SPNEGO
 
+```perl
 use Mojolicious::Lite;
 
-```perl
 my $SERVER = $ENV{AD_SERVER} // die "AD_SERVER env variable not set";
 
 app->secrets(['My secret passphrase here']);
