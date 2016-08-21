@@ -69,7 +69,7 @@ $app->plugin('SPNEGO',ad_server => $SERVER);
 
 The plugin provides the following helper method:
 
-## $c->ntlm\_auth({ad\_server => $AD\_SERVER\[, auth\_success\_cb=> $cb \])
+## $c->ntlm\_auth(ad\_server => $AD\_SERVER, auth\_success\_cb => $cb)
 
 The `ntlm_auth` method runs an NTLM authentication dialog with the browser
 by forwarding the tokens coming from the browser to the AD server specified
