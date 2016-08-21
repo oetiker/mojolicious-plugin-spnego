@@ -2,7 +2,7 @@ package Mojolicious::Plugin::SPNEGO;
 use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 my %cCache;
 
@@ -37,7 +37,7 @@ sub register {
                 /^Type3/ && do {
                     my $mesg = $ldap->bind_type3($AuthBase64);
                     if (my $user = $mesg->{ldap_user_entry}){
-                        if (my $cb = $cfg->{auth_success_callback}){
+                        if (my $cb = $cfg->{auth_success_cb}){
                             if (not $cb or $cb->($c,$user,$ldap)){
                                 $cCache->{status} = 'authenticated';
                             }
@@ -74,7 +74,7 @@ use Mojolicious::Lite;
     my $c = shift;
     if (not $c->session('user')){
         $c->ntlm_auth({
-            auth_success_callback => sub {
+            auth_success_cb => sub {
                 my $c = shift;
                 my $user = shift;
                 my $ldap = shift; # bound Net::LDAP::SPNEGO connection
@@ -115,28 +115,32 @@ The Mojolicious::Plugin::SPNEGO lets you provide NTLM SSO by using an
 active directory server as authentication provider. The plugin uses
 the L<Net::LDAP::SPNEGO> module.
 
-On loading the plugin default values for the helpers can be configures:
+On loading the plugin default values for the helpers can be configured:
 
  plugin 'SPNEGO', ad_server => $SERVER;
 
-The plugin provides the following helpers:
+or
 
-=head2 $c->ntlm_auth({ad_server => $AD_SERVER[, auth_success_callback=> $cb ])
+ $app->plugin('SPNEGO',ad_server => $SERVER);
 
-Initiate an NTLM authentication dialog with the browser by forwarding the
-tokens coming from the browser to the ad server specified in the I<ad_server>
-argument.
+The plugin provides the following helper method:
 
-If a callback is specified it will be executed once the ntlm dialog
+=head2 $c->ntlm_auth({ad_server => $AD_SERVER[, auth_success_cb=> $cb ])
+
+The I<ntlm_auth> method runs an NTLM authentication dialog with the browser
+by forwarding the tokens coming from the browser to the AD server specified
+in the I<ad_server> argument.
+
+If a I<auth_success_cb> is specified it will be executed once the ntlm dialog
 has completed successfully. Depending on the return value of the
 callback the entire process will be considered successfull or not.
 
 Since ntlm authentication is reather complex, you may want to save
 authentication success in a cookie.
 
-=head1 AUTHOR
-
-S<Tobias Oetiker, E<lt>tobi@oetiker.chE<gt>>
+Note that windows will only do automatic NTLM SSO with hosts in the local zone
+so you may have to add your webserver to this group of machines in the
+Internet Settings dialog.
 
 =head1 COPYRIGHT
 
@@ -146,5 +150,9 @@ Copyright OETIKER+PARTNER AG 2016
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+S<Tobias Oetiker, E<lt>tobi@oetiker.chE<gt>>
 
 =cut

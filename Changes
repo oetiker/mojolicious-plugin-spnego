@@ -1,2 +1,6 @@
+0.2.0 2016-08-21
+  - documentation update
+  - auth_success_callback is no called auth_success_cb
+
 0.1.0 2016-08-21
   - first public release

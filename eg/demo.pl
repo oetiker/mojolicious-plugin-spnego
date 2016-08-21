@@ -16,7 +16,7 @@ get '/' => sub {
     my $c = shift;
     if (not $c->session('user')){
         $c->ntlm_auth(
-            auth_success_callback => sub {
+            auth_success_cb => sub {
                 my $c = shift;
                 my $user = shift;
                 my $ldap = shift; # bound Net::LDAP::SPNEGO connection

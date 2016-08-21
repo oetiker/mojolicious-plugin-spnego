@@ -13,7 +13,7 @@ get '/' => sub {
    my $c = shift;
    if (not $c->session('user')){
        $c->ntlm_auth({
-           auth_success_callback => sub {
+           auth_success_cb => sub {
                my $c = shift;
                my $user = shift;
                my $ldap = shift; # bound Net::LDAP::SPNEGO connection
@@ -55,30 +55,36 @@ The Mojolicious::Plugin::SPNEGO lets you provide NTLM SSO by using an
 active directory server as authentication provider. The plugin uses
 the [Net::LDAP::SPNEGO](https://metacpan.org/pod/Net::LDAP::SPNEGO) module.
 
-On loading the plugin default values for the helpers can be configures:
+On loading the plugin default values for the helpers can be configured:
 
 ```perl
 plugin 'SPNEGO', ad_server => $SERVER;
 ```
 
-The plugin provides the following helpers:
+or
 
-## $c->ntlm\_auth({ad\_server => $AD\_SERVER\[, auth\_success\_callback=> $cb \])
+```perl
+$app->plugin('SPNEGO',ad_server => $SERVER);
+```
 
-Initiate an NTLM authentication dialog with the browser by forwarding the
-tokens coming from the browser to the ad server specified in the _ad\_server_
-argument.
+The plugin provides the following helper method:
 
-If a callback is specified it will be executed once the ntlm dialog
+## $c->ntlm\_auth({ad\_server => $AD\_SERVER\[, auth\_success\_cb=> $cb \])
+
+The _ntlm\_auth_ method runs an NTLM authentication dialog with the browser
+by forwarding the tokens coming from the browser to the AD server specified
+in the _ad\_server_ argument.
+
+If a _auth\_success\_cb_ is specified it will be executed once the ntlm dialog
 has completed successfully. Depending on the return value of the
 callback the entire process will be considered successfull or not.
 
 Since ntlm authentication is reather complex, you may want to save
 authentication success in a cookie.
 
-# AUTHOR
-
-Tobias Oetiker, <tobi@oetiker.ch>
+Note that windows will only do automatic NTLM SSO with hosts in the local zone
+so you may have to add your webserver to this group of machines in the
+Internet Settings dialog.
 
 # COPYRIGHT
 
@@ -88,3 +94,7 @@ Copyright OETIKER+PARTNER AG 2016
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+# AUTHOR
+
+Tobias Oetiker, <tobi@oetiker.ch>
