@@ -9,44 +9,49 @@ my %cCache;
 sub register {
     my $self = shift;
     my $app = shift;
-    my $plugin_cfg = ref $_[0] ? $_[0] : { @_ };
+    my $plugin_cfg = shift;
+
     $app->helper(
         ntlm_auth => sub {
             my $c = shift;
-            my $cfg = { %$plugin_cfg, ref $_[0] ? %$_[0] :  @_ };
+            my $helper_cfg = ref ${_}[0] ? %{${_}[0]} : { @_ };
+            my $cfg = { %$plugin_cfg, %$helper_cfg };
             my $cId = $c->tx->connection;
             my $cCache = $cCache{$cId} //= { status => 'init' };
             return if $cCache->{status} eq 'authenticated';
 
             my $authorization = $c->req->headers->header('Authorization') // '';
             my ($AuthBase64) = ($authorization =~ /^NTLM\s(.+)$/);
-            for ($AuthBase64 and $cCache->{status} =~ /^expect(Type\d)/){
-                my $ldap = $cCache->{ldapObj} //= Net::LDAP::SPNEGO->new($cfg->{ad_server},debug=>$cfg->{ldap_debug});
-                /^Type1/ && do {
-                    my $mesg = $ldap->bind_type1($AuthBase64);
-                    if ($mesg->{ntlm_type2_base64}){
-                        $c->res->headers->header( 'WWW-Authenticate' => 'NTLM '.$mesg->{ntlm_type2_base64});
-                        $c->render( text => 'Waiting for Type3 NTLM Token', status => 401);
-                        $cCache->{status} = 'expectType3';
-                        return 0;
-                    }
-                    # lets try with a new connection
-                    $ldap->unbind;
-                    delete $cCache->{ldapObj};
-                };
-                /^Type3/ && do {
-                    my $mesg = $ldap->bind_type3($AuthBase64);
-                    if (my $user = $mesg->{ldap_user_entry}){
-                        if (my $cb = $cfg->{auth_success_cb}){
-                            if (not $cb or $cb->($c,$user,$ldap)){
-                                $cCache->{status} = 'authenticated';
+            my ($status) = ($cCache->{status} =~ /^expect(Type\d)/);
+            if ($AuthBase64 and $status){
+                for ($status){
+                    my $ldap = $cCache->{ldapObj} //= Net::LDAP::SPNEGO->new($cfg->{ad_server},debug=>$cfg->{ldap_debug});
+                    /^Type1/ && do {
+                        my $mesg = $ldap->bind_type1($AuthBase64);
+                        if ($mesg->{ntlm_type2_base64}){
+                            $c->res->headers->header( 'WWW-Authenticate' => 'NTLM '.$mesg->{ntlm_type2_base64});
+                            $c->render( text => 'Waiting for Type3 NTLM Token', status => 401);
+                            $cCache->{status} = 'expectType3';
+                            return 0;
+                        }
+                        # lets try with a new connection
+                        $ldap->unbind;
+                        delete $cCache->{ldapObj};
+                    };
+                    /^Type3/ && do {
+                        my $mesg = $ldap->bind_type3($AuthBase64);
+                        if (my $user = $mesg->{ldap_user_entry}){
+                            if (my $cb = $cfg->{auth_success_cb}){
+                                if (not $cb or $cb->($c,$user,$ldap)){
+                                    $cCache->{status} = 'authenticated';
+                                }
                             }
                         }
-                    }
-                    $ldap->unbind;
-                    delete $cCache->{ldapObj};
-                    return  $cCache->{status} eq 'authenticated';
-                };
+                        $ldap->unbind;
+                        delete $cCache->{ldapObj};
+                        return  $cCache->{status} eq 'authenticated';
+                    };
+                }
             }
             $c->res->headers->header( 'WWW-Authenticate' => 'NTLM' );
             $c->render( text => 'Waiting for Type 1 NTLM Token', status => 401 );
