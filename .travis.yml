@@ -12,5 +12,9 @@ perl:
   - "5.22"
   - "5.24"
 
+before_install:
+  - cpanm --notest
+    Devel::Cover::Report::Coveralls
+
 script:
   - cover -test -report coveralls
