@@ -17,8 +17,8 @@ WriteMakefile(
     'Net::LDAP::SPNEGO' => '0.1.4',
     'Mojolicious' => '7.01',
   },
-  TEST_REQUIRES => {
-  },
+  # TEST_REQUIRES => {
+  # },
   BUILD_REQUIRES => {
     'Pod::Markdown::Github' => '0.01',
     'CPAN::Uploader' => 0,
