@@ -2,7 +2,7 @@ package Mojolicious::Plugin::SPNEGO;
 use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 
-our $VERSION = '0.2.3';
+our $VERSION = '0.2.4';
 
 my %cCache;
 
@@ -22,10 +22,13 @@ sub register {
 
             my $authorization = $c->req->headers->header('Authorization') // '';
             my ($AuthBase64) = ($authorization =~ /^NTLM\s(.+)$/);
-            my ($status) = ($cCache->{status} =~ /^expect(Type\d)/);
+            my ($status) = ($cCache->{status} =~ /^expect(Type[13])/);
             if ($AuthBase64 and $status){
                 for ($status){
-                    my $ldap = $cCache->{ldapObj} //= Net::LDAP::SPNEGO->new($cfg->{ad_server},debug=>$cfg->{ldap_debug});
+                    my $ldap = $cCache->{ldapObj} //= Net::LDAP::SPNEGO->new(
+                        $cfg->{ad_server},
+                        debug=>$cfg->{ldap_debug}
+                    );
                     /^Type1/ && do {
                         my $mesg = $ldap->bind_type1($AuthBase64);
                         if ($mesg->{ntlm_type2_base64}){
