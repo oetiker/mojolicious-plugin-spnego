@@ -2,7 +2,7 @@ package Mojolicious::Plugin::SPNEGO;
 use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 
-our $VERSION = '0.2.5';
+our $VERSION = '0.2.6';
 
 my %cCache;
 
@@ -25,7 +25,7 @@ sub register {
             my $cCache = $cCache{$cId} //= {
                 status => $AuthBase64 ? 'expectType1' : 'init'
             };
-            return if $cCache->{status} eq 'authenticated';
+            return 1 if $cCache->{status} eq 'authenticated';
 
             my ($status) = ($cCache->{status} =~ /^expect(Type[13])/);
             $c->app->log->debug("status: $status");
@@ -59,7 +59,8 @@ sub register {
                         }
                         $ldap->unbind;
                         delete $cCache->{ldapObj};
-                        return  $cCache->{status} eq 'authenticated';
+                        return 1 if $cCache->{status} eq 'authenticated';
+                        return $c->render( text => 'sorry auth has failed', status => 401);
                     };
                 }
             }
@@ -97,7 +98,7 @@ __END__
                 $c->session('name',$user->{displayname});
                 my $groups = $ldap->get_ad_groups($user->{samaccountname});
                 $c->session('groups',[ sort keys %$groups]);
-                return 1;
+                return 1; # 1 is you are happy with the outcome
             }
         }) or return;
     }
