@@ -2,7 +2,7 @@ package Mojolicious::Plugin::SPNEGO;
 use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 
-our $VERSION = '0.2.4';
+our $VERSION = '0.2.5';
 
 my %cCache;
 
@@ -14,7 +14,7 @@ sub register {
     $app->helper(
         ntlm_auth => sub {
             my $c = shift;
-            my $helper_cfg = ref ${_}[0] ? %{${_}[0]} : { @_ };
+            my $helper_cfg = ref ${_}[0] eq 'HASH' ? ${_}[0] : { @_ };
             my $cfg = { %$plugin_cfg, %$helper_cfg };
             my $cId = $c->tx->connection;
             my $cCache = $cCache{$cId} //= { status => 'init' };
