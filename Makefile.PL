@@ -46,7 +46,7 @@ sub MY::postamble {
 all:: README.md README
 
 README.md: $self->{VERSION_FROM}
-	\$(PERL) -I$tpd/lib/perl5 -MPod::Markdown::Github -e 'binmode(STDOUT, ":utf8");Pod::Markdown::Github->new->filter(q{$self->{VERSION_FROM}})' > README.md
+	\$(PERL) -I$tpd/lib/perl5 -MPod::Markdown::Github -e "binmode(STDOUT, q(:utf8));Pod::Markdown::Github->new->filter(q($self->{VERSION_FROM}))" > README.md
 
 README: README.md
 	cp README.md README

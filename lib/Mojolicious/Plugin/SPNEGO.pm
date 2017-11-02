@@ -17,12 +17,19 @@ sub register {
             my $helper_cfg = ref ${_}[0] eq 'HASH' ? ${_}[0] : { @_ };
             my $cfg = { %$plugin_cfg, %$helper_cfg };
             my $cId = $c->tx->connection;
-            my $cCache = $cCache{$cId} //= { status => 'init' };
-            return if $cCache->{status} eq 'authenticated';
 
             my $authorization = $c->req->headers->header('Authorization') // '';
             my ($AuthBase64) = ($authorization =~ /^NTLM\s(.+)$/);
+            $c->app->log->debug("AuthBase64: $AuthBase64");
+
+            my $cCache = $cCache{$cId} //= {
+                status => $AuthBase64 ? 'expectType1' : 'init'
+            };
+            return if $cCache->{status} eq 'authenticated';
+
             my ($status) = ($cCache->{status} =~ /^expect(Type[13])/);
+            $c->app->log->debug("status: $status");
+
             if ($AuthBase64 and $status){
                 for ($status){
                     my $ldap = $cCache->{ldapObj} //= Net::LDAP::SPNEGO->new(
