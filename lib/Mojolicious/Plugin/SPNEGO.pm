@@ -2,7 +2,7 @@ package Mojolicious::Plugin::SPNEGO;
 use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 
-our $VERSION = '0.2.6';
+our $VERSION = '0.2.7';
 
 my %cCache;
 
@@ -20,7 +20,7 @@ sub register {
 
             my $authorization = $c->req->headers->header('Authorization') // '';
             my ($AuthBase64) = ($authorization =~ /^NTLM\s(.+)$/);
-            $c->app->log->debug("AuthBase64: $AuthBase64");
+            # $c->app->log->debug("AuthBase64: $AuthBase64") if $AuthBase64;
 
             my $cCache = $cCache{$cId} //= {
                 status => $AuthBase64 ? 'expectType1' : 'init'
@@ -28,7 +28,7 @@ sub register {
             return 1 if $cCache->{status} eq 'authenticated';
 
             my ($status) = ($cCache->{status} =~ /^expect(Type[13])/);
-            $c->app->log->debug("status: $status");
+            # $c->app->log->debug("status: $status") if $status;
 
             if ($AuthBase64 and $status){
                 for ($status){
