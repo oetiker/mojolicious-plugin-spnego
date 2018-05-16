@@ -1,3 +1,6 @@
+0.3.1 2018-05-16
+  - getting Proxy auth working
+
 0.2.5 2017-11-02
   - fix argument parsing
 

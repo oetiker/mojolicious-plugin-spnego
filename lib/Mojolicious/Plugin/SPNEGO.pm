@@ -2,7 +2,7 @@ package Mojolicious::Plugin::SPNEGO;
 use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 
-our $VERSION = '0.3.0';
+our $VERSION = '0.3.1';
 
 my %cCache;
 
@@ -64,7 +64,7 @@ sub register {
                     };
                 }
             }
-            $c->res->headers->header( 'WWW-Authenticate' => 'NTLM' );
+            $c->res->headers->header( ($cfg->{web_proxy_mode} ? 'Proxy' : 'WWW') . '-Authenticate' => 'NTLM' );
             $c->render( text => 'Waiting for Type 1 NTLM Token', status => 401 );
             $cCache->{status} = 'expectType1';
             return 0;
