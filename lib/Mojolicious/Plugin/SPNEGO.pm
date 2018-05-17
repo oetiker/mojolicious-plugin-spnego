@@ -2,7 +2,7 @@ package Mojolicious::Plugin::SPNEGO;
 use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 
-our $VERSION = '0.3.1';
+our $VERSION = '0.3.2';
 
 my %cCache;
 
@@ -60,7 +60,6 @@ sub register {
                         $ldap->unbind;
                         delete $cCache->{ldapObj};
                         return 1 if $cCache->{status} eq 'authenticated';
-                        return $c->render( text => 'sorry auth has failed', status => 401);
                     };
                 }
             }
