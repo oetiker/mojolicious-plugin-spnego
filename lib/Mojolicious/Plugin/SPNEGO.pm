@@ -2,8 +2,8 @@ package Mojolicious::Plugin::SPNEGO;
 use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 use IO::Socket::Timeout;
-
-our $VERSION = '0.3.5';
+use Mojo::Util qw(b64_decode);
+our $VERSION = '0.3.6';
 
 my %cCache;
 
@@ -46,6 +46,7 @@ sub register {
                     $socket->read_timeout($timeout);
                     $socket->write_timeout($timeout);
                     /^Type1/ && do {
+                        $c->app->log->debug("Bind Type1 ...");
                         my $mesg = $ldap->bind_type1($AuthBase64);
                         if ($mesg->{ntlm_type2_base64}){
                             $c->res->headers->header( ($cfg->{web_proxy_mode} ? 'Proxy' : 'WWW' ) . '-Authenticate' => 'NTLM '.$mesg->{ntlm_type2_base64});
@@ -58,6 +59,7 @@ sub register {
                         delete $cCache->{ldapObj};
                     };
                     /^Type3/ && do {
+                        $c->app->log->debug("Bind Type3 as user '".$self->_get_user_from_ntlm_type3(b64_decode($AuthBase64))."'");
                         my $mesg = $ldap->bind_type3($AuthBase64);
                         if (my $user = $mesg->{ldap_user_entry}){
                             if (my $cb = $cfg->{auth_success_cb}){
