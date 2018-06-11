@@ -86,7 +86,11 @@ sub register {
 
 __END__
 
-=head1 Mojolicious::Plugin::SPNEGO
+=head1 NAME
+
+Mojolicious::Plugin::SPNEGO - Provide NTLM authentication by forwarding requests to an upstram AD server.
+
+=head1 SYNOPSIS
 
  use Mojolicious::Lite;
 
