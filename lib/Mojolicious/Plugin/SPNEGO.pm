@@ -1,8 +1,9 @@
 package Mojolicious::Plugin::SPNEGO;
 use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
+use IO::Socket::Timeout;
 
-our $VERSION = '0.3.3';
+our $VERSION = '0.3.5';
 
 my %cCache;
 
@@ -32,12 +33,18 @@ sub register {
 
             if ($AuthBase64 and $status){
                 for ($status){
+                    my $timeout = $cfg->{timeout} // 5;
                     my $ldap = $cCache->{ldapObj} //= Net::LDAP::SPNEGO->new(
                         $cfg->{ad_server},
                         debug=>($cfg->{ldap_debug}//$ENV{SPNEGO_LDAP_DEBUG}//0),
-                        onerror=>'die',
-                        timeout=>5
+                        onerror=> sub { my $msg = shift; $c->app->log->error($msg->error);return $msg},
+                        timeout=>$timeout
                     );
+                    # Read/Write timeouts via setsockopt
+                    my $socket = $ldap->socket(sasl_layer=>0);
+                    IO::Socket::Timeout->enable_timeouts_on($socket);
+                    $socket->read_timeout($timeout);
+                    $socket->write_timeout($timeout);
                     /^Type1/ && do {
                         my $mesg = $ldap->bind_type1($AuthBase64);
                         if ($mesg->{ntlm_type2_base64}){
@@ -142,7 +149,7 @@ or
 
 The plugin provides the following helper method:
 
-=head2 $c->ntlm_auth(ad_server => $AD_SERVER, ldap_debug => 0, web_proxy_mode => 1, auth_success_cb => $cb)
+=head2 $c->ntlm_auth(ad_server => $AD_SERVER, timeout=>5, ldap_debug => 0, web_proxy_mode => 1, auth_success_cb => $cb)
 
 The C<ntlm_auth> method runs an NTLM authentication dialog with the browser
 by forwarding the tokens coming from the browser to the AD server specified

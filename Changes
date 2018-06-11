@@ -1,3 +1,6 @@
+0.3.4 2018-06-11
+  - timeout for reading and writing added
+
 0.3.3 2018-06-11
   - SPNEGO_LDAP_DEBUG environemnt to override debug value
   - timeout reduced to 5s
