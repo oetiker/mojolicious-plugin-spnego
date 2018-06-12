@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 use IO::Socket::Timeout;
 use Mojo::Util qw(b64_decode);
-our $VERSION = '0.3.6';
+our $VERSION = '0.3.7';
 
 my %cCache;
 
@@ -59,7 +59,7 @@ sub register {
                         delete $cCache->{ldapObj};
                     };
                     /^Type3/ && do {
-                        $c->app->log->debug("Bind Type3 as user '".$self->_get_user_from_ntlm_type3(b64_decode($AuthBase64))."'");
+                        $c->app->log->debug("Bind Type3 as user '".$ldap->_get_user_from_ntlm_type3(b64_decode($AuthBase64))."'");
                         my $mesg = $ldap->bind_type3($AuthBase64);
                         if (my $user = $mesg->{ldap_user_entry}){
                             if (my $cb = $cfg->{auth_success_cb}){
