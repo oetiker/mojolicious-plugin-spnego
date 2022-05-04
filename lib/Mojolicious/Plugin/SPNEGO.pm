@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 use IO::Socket::Timeout;
 use Mojo::Util qw(b64_decode);
-our $VERSION = '0.5.1';
+our $VERSION = '0.5.2';
 
 my %cCache;
 
@@ -46,7 +46,7 @@ sub register {
                     ) or return 0;
                     if ($ldap->uri !~ m{^ldaps://}){
                         my $msg;
-                        if ($cfg->{verify})){
+                        if ($cfg->{verify}){
                             $msg = $ldap->start_tls(verify => $cfg->{verify});
                         }
                         elsif ($cfg->{start_tls}){
