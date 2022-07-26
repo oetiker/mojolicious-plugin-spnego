@@ -20,3 +20,6 @@ nytprof.out
 3rd/
 *.tar.gz
 README
+*~
+dist.sh
+.DS_Store
