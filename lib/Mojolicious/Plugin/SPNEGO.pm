@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 use IO::Socket::Timeout;
 use Mojo::Util qw(b64_decode);
-our $VERSION = '0.5.3';
+our $VERSION = '0.5.4';
 
 my %cCache;
 
@@ -36,7 +36,7 @@ sub register {
                     my $timeout = $cfg->{timeout} // 10;
                     my $ldap = $cCache->{ldapObj};
                     if (not $ldap) {
-                        $ldap = Net::LDAP::SPNEGO->new(
+                        $ldap = $cCache->{ldapObj} = Net::LDAP::SPNEGO->new(
                             $cfg->{ad_server},
                             debug=>($cfg->{ldap_debug}//$ENV{SPNEGO_LDAP_DEBUG}//0),
                             onerror=> sub { my $msg = shift; 
